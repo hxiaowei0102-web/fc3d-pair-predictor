@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# WorkBuddy (not needed on GitHub)
+.workbuddy/
+
+# Old prediction JSONs (only keep v12)
+prediction_v8.json
+prediction_v9.json
+prediction_v10.json
+prediction_v11.json
+prediction_v18.json
+prediction_v19.json
+
+# Test files
+*_test.py
+test_*.py
+diag_*.py
+ensemble_*.py
+find_threshold.py
+precise_filter.py
+hot_filter_test.py
+pos_test.py
+quick_test.py
+search_*.py
+
+# Old versions
+predict_v8.py
+predict_v9.py
+predict_v10.py
+predict_v11.py
+predict_v18.py
+predict_v19.py
+predict_v20.py
+predict_v20_fixed.py

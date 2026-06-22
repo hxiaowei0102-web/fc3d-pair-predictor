@@ -1,0 +1,2845 @@
+{
+  "generated_at": "2026-06-22 13:47:15",
+  "version": "12.0.0-auto",
+  "total_draws": 1005,
+  "latest": {
+    "issue": "2026162",
+    "digits": "585"
+  },
+  "next_issue": "2026163",
+  "predictions": [
+    {
+      "pair": [
+        1,
+        4
+      ],
+      "pair_str": "14",
+      "algo": "DIGIT",
+      "algo_cn": "数字投影",
+      "tier": "D1",
+      "last_seen": 45,
+      "global_rate": 5.37,
+      "freq_30": 0,
+      "freq_50": 1,
+      "freq_60": 1,
+      "freq_80": 3,
+      "freq_100": 3,
+      "wakeup_history": [
+        47,
+        53,
+        51,
+        55,
+        63
+      ]
+    },
+    {
+      "pair": [
+        0,
+        1
+      ],
+      "pair_str": "01",
+      "algo": "MOM",
+      "algo_cn": "数字动量",
+      "tier": "M1",
+      "last_seen": 107,
+      "global_rate": 4.98,
+      "freq_30": 0,
+      "freq_50": 0,
+      "freq_60": 0,
+      "freq_80": 0,
+      "freq_100": 0,
+      "wakeup_history": [
+        48,
+        76,
+        47,
+        65
+      ]
+    },
+    {
+      "pair": [
+        3,
+        8
+      ],
+      "pair_str": "38",
+      "algo": "WAKEUP",
+      "algo_cn": "唤醒检测",
+      "tier": "W1",
+      "last_seen": 51,
+      "global_rate": 4.78,
+      "freq_30": 0,
+      "freq_50": 0,
+      "freq_60": 1,
+      "freq_80": 2,
+      "freq_100": 3,
+      "wakeup_history": [
+        78,
+        41,
+        61,
+        84,
+        128
+      ]
+    }
+  ],
+  "algorithm": {
+    "name": "V12 DIGIT→MOM→WAKEUP",
+    "algorithms": {
+      "DIGIT": "数字投影: 指数衰减数字热度，6冷池选对",
+      "MOM": "数字动量: 避热号+冷对优先",
+      "WAKEUP": "唤醒检测: 识别长冷后突现模式"
+    }
+  },
+  "backtest": {
+    "total_periods": 100,
+    "correct": 95,
+    "accuracy": 95.0,
+    "algo_accuracy": {
+      "DIGIT": 98.0,
+      "MOM": 99.0,
+      "WAKEUP": 98.0
+    },
+    "results": [
+      {
+        "issue": "2026162",
+        "digits": "585",
+        "actual_pairs": [
+          "58"
+        ],
+        "predictions": [
+          {
+            "pair": "14",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026161",
+        "digits": "529",
+        "actual_pairs": [
+          "25",
+          "29",
+          "59"
+        ],
+        "predictions": [
+          {
+            "pair": "05",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "06",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026160",
+        "digits": "332",
+        "actual_pairs": [
+          "23"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "05",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026159",
+        "digits": "995",
+        "actual_pairs": [
+          "59"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "05",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026158",
+        "digits": "178",
+        "actual_pairs": [
+          "17",
+          "18",
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "05",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026157",
+        "digits": "327",
+        "actual_pairs": [
+          "23",
+          "27",
+          "37"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026156",
+        "digits": "162",
+        "actual_pairs": [
+          "12",
+          "16",
+          "26"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026155",
+        "digits": "409",
+        "actual_pairs": [
+          "04",
+          "09",
+          "49"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026154",
+        "digits": "377",
+        "actual_pairs": [
+          "37"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026153",
+        "digits": "887",
+        "actual_pairs": [
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026152",
+        "digits": "220",
+        "actual_pairs": [
+          "02"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026151",
+        "digits": "631",
+        "actual_pairs": [
+          "13",
+          "16",
+          "36"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026150",
+        "digits": "720",
+        "actual_pairs": [
+          "02",
+          "07",
+          "27"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026149",
+        "digits": "696",
+        "actual_pairs": [
+          "69"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026148",
+        "digits": "408",
+        "actual_pairs": [
+          "04",
+          "08",
+          "48"
+        ],
+        "predictions": [
+          {
+            "pair": "01",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026147",
+        "digits": "712",
+        "actual_pairs": [
+          "12",
+          "17",
+          "27"
+        ],
+        "predictions": [
+          {
+            "pair": "01",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026146",
+        "digits": "464",
+        "actual_pairs": [
+          "46"
+        ],
+        "predictions": [
+          {
+            "pair": "01",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "04",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026145",
+        "digits": "279",
+        "actual_pairs": [
+          "27",
+          "29",
+          "79"
+        ],
+        "predictions": [
+          {
+            "pair": "01",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "04",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026144",
+        "digits": "726",
+        "actual_pairs": [
+          "26",
+          "27",
+          "67"
+        ],
+        "predictions": [
+          {
+            "pair": "01",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026143",
+        "digits": "376",
+        "actual_pairs": [
+          "36",
+          "37",
+          "67"
+        ],
+        "predictions": [
+          {
+            "pair": "01",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026142",
+        "digits": "894",
+        "actual_pairs": [
+          "48",
+          "49",
+          "89"
+        ],
+        "predictions": [
+          {
+            "pair": "01",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "17",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026141",
+        "digits": "397",
+        "actual_pairs": [
+          "37",
+          "39",
+          "79"
+        ],
+        "predictions": [
+          {
+            "pair": "19",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "17",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026140",
+        "digits": "285",
+        "actual_pairs": [
+          "25",
+          "28",
+          "58"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "17",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026139",
+        "digits": "286",
+        "actual_pairs": [
+          "26",
+          "28",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "17",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026138",
+        "digits": "790",
+        "actual_pairs": [
+          "07",
+          "09",
+          "79"
+        ],
+        "predictions": [
+          {
+            "pair": "29",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026137",
+        "digits": "165",
+        "actual_pairs": [
+          "15",
+          "16",
+          "56"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "29",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026136",
+        "digits": "889",
+        "actual_pairs": [
+          "89"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "24",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026135",
+        "digits": "487",
+        "actual_pairs": [
+          "47",
+          "48",
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "24",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026134",
+        "digits": "654",
+        "actual_pairs": [
+          "45",
+          "46",
+          "56"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "69",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026133",
+        "digits": "080",
+        "actual_pairs": [
+          "08"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026132",
+        "digits": "756",
+        "actual_pairs": [
+          "56",
+          "57",
+          "67"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026131",
+        "digits": "598",
+        "actual_pairs": [
+          "58",
+          "59",
+          "89"
+        ],
+        "predictions": [
+          {
+            "pair": "35",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026130",
+        "digits": "267",
+        "actual_pairs": [
+          "26",
+          "27",
+          "67"
+        ],
+        "predictions": [
+          {
+            "pair": "69",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026129",
+        "digits": "023",
+        "actual_pairs": [
+          "02",
+          "03",
+          "23"
+        ],
+        "predictions": [
+          {
+            "pair": "25",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "57",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026128",
+        "digits": "776",
+        "actual_pairs": [
+          "67"
+        ],
+        "predictions": [
+          {
+            "pair": "57",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "69",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026127",
+        "digits": "700",
+        "actual_pairs": [
+          "07"
+        ],
+        "predictions": [
+          {
+            "pair": "57",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "07",
+            "algo": "WAKEUP",
+            "correct": false
+          }
+        ],
+        "hit": 2,
+        "all_correct": false
+      },
+      {
+        "issue": "2026126",
+        "digits": "846",
+        "actual_pairs": [
+          "46",
+          "48",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "57",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "07",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026125",
+        "digits": "954",
+        "actual_pairs": [
+          "45",
+          "49",
+          "59"
+        ],
+        "predictions": [
+          {
+            "pair": "57",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "09",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "07",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026124",
+        "digits": "280",
+        "actual_pairs": [
+          "02",
+          "08",
+          "28"
+        ],
+        "predictions": [
+          {
+            "pair": "57",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "07",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026123",
+        "digits": "200",
+        "actual_pairs": [
+          "02"
+        ],
+        "predictions": [
+          {
+            "pair": "57",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "07",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026122",
+        "digits": "346",
+        "actual_pairs": [
+          "34",
+          "36",
+          "46"
+        ],
+        "predictions": [
+          {
+            "pair": "57",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "49",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026121",
+        "digits": "393",
+        "actual_pairs": [
+          "39"
+        ],
+        "predictions": [
+          {
+            "pair": "59",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "49",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026120",
+        "digits": "734",
+        "actual_pairs": [
+          "34",
+          "37",
+          "47"
+        ],
+        "predictions": [
+          {
+            "pair": "49",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026119",
+        "digits": "112",
+        "actual_pairs": [
+          "12"
+        ],
+        "predictions": [
+          {
+            "pair": "49",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026118",
+        "digits": "132",
+        "actual_pairs": [
+          "12",
+          "13",
+          "23"
+        ],
+        "predictions": [
+          {
+            "pair": "23",
+            "algo": "DIGIT",
+            "correct": false
+          },
+          {
+            "pair": "34",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 2,
+        "all_correct": false
+      },
+      {
+        "issue": "2026117",
+        "digits": "411",
+        "actual_pairs": [
+          "14"
+        ],
+        "predictions": [
+          {
+            "pair": "23",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026116",
+        "digits": "020",
+        "actual_pairs": [
+          "02"
+        ],
+        "predictions": [
+          {
+            "pair": "03",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026115",
+        "digits": "581",
+        "actual_pairs": [
+          "15",
+          "18",
+          "58"
+        ],
+        "predictions": [
+          {
+            "pair": "25",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "12",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026114",
+        "digits": "864",
+        "actual_pairs": [
+          "46",
+          "48",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "25",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "12",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026113",
+        "digits": "040",
+        "actual_pairs": [
+          "04"
+        ],
+        "predictions": [
+          {
+            "pair": "09",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "12",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026112",
+        "digits": "065",
+        "actual_pairs": [
+          "05",
+          "06",
+          "56"
+        ],
+        "predictions": [
+          {
+            "pair": "09",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026111",
+        "digits": "863",
+        "actual_pairs": [
+          "36",
+          "38",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "03",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "25",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026110",
+        "digits": "379",
+        "actual_pairs": [
+          "37",
+          "39",
+          "79"
+        ],
+        "predictions": [
+          {
+            "pair": "03",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "MOM",
+            "correct": false
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 2,
+        "all_correct": false
+      },
+      {
+        "issue": "2026109",
+        "digits": "195",
+        "actual_pairs": [
+          "15",
+          "19",
+          "59"
+        ],
+        "predictions": [
+          {
+            "pair": "03",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026108",
+        "digits": "671",
+        "actual_pairs": [
+          "16",
+          "17",
+          "67"
+        ],
+        "predictions": [
+          {
+            "pair": "03",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026107",
+        "digits": "278",
+        "actual_pairs": [
+          "27",
+          "28",
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "03",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026106",
+        "digits": "928",
+        "actual_pairs": [
+          "28",
+          "29",
+          "89"
+        ],
+        "predictions": [
+          {
+            "pair": "79",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026105",
+        "digits": "631",
+        "actual_pairs": [
+          "13",
+          "16",
+          "36"
+        ],
+        "predictions": [
+          {
+            "pair": "39",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026104",
+        "digits": "482",
+        "actual_pairs": [
+          "24",
+          "28",
+          "48"
+        ],
+        "predictions": [
+          {
+            "pair": "39",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026103",
+        "digits": "661",
+        "actual_pairs": [
+          "16"
+        ],
+        "predictions": [
+          {
+            "pair": "39",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026102",
+        "digits": "420",
+        "actual_pairs": [
+          "02",
+          "04",
+          "24"
+        ],
+        "predictions": [
+          {
+            "pair": "39",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026101",
+        "digits": "584",
+        "actual_pairs": [
+          "45",
+          "48",
+          "58"
+        ],
+        "predictions": [
+          {
+            "pair": "39",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "34",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026100",
+        "digits": "414",
+        "actual_pairs": [
+          "14"
+        ],
+        "predictions": [
+          {
+            "pair": "34",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026099",
+        "digits": "877",
+        "actual_pairs": [
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "79",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026098",
+        "digits": "513",
+        "actual_pairs": [
+          "13",
+          "15",
+          "35"
+        ],
+        "predictions": [
+          {
+            "pair": "34",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "39",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026097",
+        "digits": "818",
+        "actual_pairs": [
+          "18"
+        ],
+        "predictions": [
+          {
+            "pair": "34",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026096",
+        "digits": "689",
+        "actual_pairs": [
+          "68",
+          "69",
+          "89"
+        ],
+        "predictions": [
+          {
+            "pair": "79",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026095",
+        "digits": "022",
+        "actual_pairs": [
+          "02"
+        ],
+        "predictions": [
+          {
+            "pair": "79",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026094",
+        "digits": "418",
+        "actual_pairs": [
+          "14",
+          "18",
+          "48"
+        ],
+        "predictions": [
+          {
+            "pair": "79",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026093",
+        "digits": "518",
+        "actual_pairs": [
+          "15",
+          "18",
+          "58"
+        ],
+        "predictions": [
+          {
+            "pair": "79",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": false
+          }
+        ],
+        "hit": 2,
+        "all_correct": false
+      },
+      {
+        "issue": "2026092",
+        "digits": "870",
+        "actual_pairs": [
+          "07",
+          "08",
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "79",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026091",
+        "digits": "537",
+        "actual_pairs": [
+          "35",
+          "37",
+          "57"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": false
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 2,
+        "all_correct": false
+      },
+      {
+        "issue": "2026090",
+        "digits": "816",
+        "actual_pairs": [
+          "16",
+          "18",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026089",
+        "digits": "922",
+        "actual_pairs": [
+          "29"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "35",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026088",
+        "digits": "608",
+        "actual_pairs": [
+          "06",
+          "08",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026087",
+        "digits": "911",
+        "actual_pairs": [
+          "19"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026086",
+        "digits": "382",
+        "actual_pairs": [
+          "23",
+          "28",
+          "38"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026085",
+        "digits": "118",
+        "actual_pairs": [
+          "18"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026084",
+        "digits": "456",
+        "actual_pairs": [
+          "45",
+          "46",
+          "56"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026083",
+        "digits": "506",
+        "actual_pairs": [
+          "05",
+          "06",
+          "56"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026082",
+        "digits": "942",
+        "actual_pairs": [
+          "24",
+          "29",
+          "49"
+        ],
+        "predictions": [
+          {
+            "pair": "19",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "37",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026081",
+        "digits": "827",
+        "actual_pairs": [
+          "27",
+          "28",
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026080",
+        "digits": "802",
+        "actual_pairs": [
+          "02",
+          "08",
+          "28"
+        ],
+        "predictions": [
+          {
+            "pair": "58",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "37",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "19",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026079",
+        "digits": "233",
+        "actual_pairs": [
+          "23"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "13",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026078",
+        "digits": "049",
+        "actual_pairs": [
+          "04",
+          "09",
+          "49"
+        ],
+        "predictions": [
+          {
+            "pair": "37",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "13",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026077",
+        "digits": "112",
+        "actual_pairs": [
+          "12"
+        ],
+        "predictions": [
+          {
+            "pair": "13",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "37",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026076",
+        "digits": "863",
+        "actual_pairs": [
+          "36",
+          "38",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "13",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "37",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026075",
+        "digits": "816",
+        "actual_pairs": [
+          "16",
+          "18",
+          "68"
+        ],
+        "predictions": [
+          {
+            "pair": "13",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "58",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026074",
+        "digits": "487",
+        "actual_pairs": [
+          "47",
+          "48",
+          "78"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "37",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "14",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026073",
+        "digits": "504",
+        "actual_pairs": [
+          "04",
+          "05",
+          "45"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "28",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "37",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026072",
+        "digits": "245",
+        "actual_pairs": [
+          "24",
+          "25",
+          "45"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "28",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026071",
+        "digits": "261",
+        "actual_pairs": [
+          "12",
+          "16",
+          "26"
+        ],
+        "predictions": [
+          {
+            "pair": "13",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026070",
+        "digits": "484",
+        "actual_pairs": [
+          "48"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "28",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026069",
+        "digits": "908",
+        "actual_pairs": [
+          "08",
+          "09",
+          "89"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "28",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026068",
+        "digits": "706",
+        "actual_pairs": [
+          "06",
+          "07",
+          "67"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "08",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026067",
+        "digits": "695",
+        "actual_pairs": [
+          "56",
+          "59",
+          "69"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "08",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026066",
+        "digits": "934",
+        "actual_pairs": [
+          "34",
+          "39",
+          "49"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "08",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026065",
+        "digits": "057",
+        "actual_pairs": [
+          "05",
+          "07",
+          "57"
+        ],
+        "predictions": [
+          {
+            "pair": "38",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "08",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026064",
+        "digits": "604",
+        "actual_pairs": [
+          "04",
+          "06",
+          "46"
+        ],
+        "predictions": [
+          {
+            "pair": "08",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "78",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
+      {
+        "issue": "2026063",
+        "digits": "517",
+        "actual_pairs": [
+          "15",
+          "17",
+          "57"
+        ],
+        "predictions": [
+          {
+            "pair": "08",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "06",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "28",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      }
+    ]
+  }
+}

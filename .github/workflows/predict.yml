@@ -1,6 +1,14 @@
 name: 福彩3D每日预测
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'predict_v12.py'
+      - 'auto_predict.py'
+      - 'index.html'
+      - 'prediction_v12.json'
+      - 'history.csv'
   schedule:
     # 每天北京时间 21:30 (UTC 13:30)
     - cron: '30 13 * * *'

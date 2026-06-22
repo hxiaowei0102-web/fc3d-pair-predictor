@@ -17,12 +17,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .header .issue{font-size:48px;font-weight:900;letter-spacing:4px;background:linear-gradient(135deg,#c4b5fd,#fbbf24,#f87171);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
 .header .sub{font-size:14px;color:#64748b;letter-spacing:1px}
 .pred-section{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
-.pred-card{background:#1e293b;border-radius:16px;padding:20px 22px;min-width:170px;text-align:center;border:2px solid #334155;transition:all 0.3s;flex:1;min-width:155px;max-width:240px}
+.pred-card{background:#1e293b;border-radius:16px;padding:20px 22px;min-width:170px;text-align:center;border:2px solid #334155;transition:all 0.3s;flex:1;min-width:155px;max-width:240px;display:flex;flex-direction:column;align-items:center}
 .pred-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.pred-left{display:flex;flex-direction:column;align-items:center}
+.pred-right{display:flex;flex-direction:column;align-items:center}
 .algo-badge{display:inline-block;padding:3px 10px;border-radius:14px;font-size:10px;font-weight:700;color:#fff;margin-bottom:6px;letter-spacing:1px}
 .algo-name{font-size:11px;color:#94a3b8;margin-bottom:8px}
 .pred-num{font-size:58px;font-weight:900;letter-spacing:8px;color:#f8fafc;line-height:1.1}
 .pred-info{font-size:10px;color:#64748b;margin-top:8px;line-height:1.5}
+.pred-wake{font-size:9px;color:#f87171;margin-top:2px}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .stat-card{background:#1e293b;border-radius:14px;padding:16px 10px;text-align:center;border:1px solid #334155}
 .stat-card .val{font-size:28px;font-weight:900}
@@ -52,7 +55,53 @@ tr:hover td{background:#1e293b}
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
 .si{display:flex;align-items:center;gap:6px;padding:10px 14px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.15);border-radius:8px;font-size:11px;color:#34d399}
 .footer{text-align:center;padding:16px;color:#475569;font-size:10px;line-height:1.8}
-@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}.algo-grid{grid-template-columns:1fr}.pred-section{flex-direction:column;align-items:center}.pred-card{max-width:100%}.pred-num{font-size:44px}.header .issue{font-size:36px}}
+@media(max-width:640px){
+  .c{padding:8px}
+  /* 页头紧凑 */
+  .header{padding:18px 10px 12px;border-radius:12px;margin-bottom:10px}
+  .header .ver{font-size:10px;letter-spacing:2px}
+  .header .badge{font-size:9px;padding:2px 8px}
+  .header .issue{font-size:42px;letter-spacing:2px}
+  .header .sub{font-size:11px;line-height:1.5}
+  /* 预测卡片 - 横向布局: 数字左 信息右 */
+  .pred-section{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:10px}
+  .pred-card{flex-direction:row;align-items:center;max-width:100%;min-width:0;padding:12px 14px;border-radius:12px;gap:14px;text-align:left}
+  .pred-left{flex-shrink:0;min-width:72px;align-items:center}
+  .pred-right{flex:1;align-items:flex-start;min-width:0}
+  .pred-card .algo-badge{margin-bottom:2px;font-size:8px;padding:2px 7px}
+  .pred-card .algo-name{font-size:10px;margin-bottom:2px}
+  .pred-num{font-size:46px;letter-spacing:3px;line-height:1}
+  .pred-info{font-size:10px;margin-top:2px}
+  .pred-wake{font-size:8px}
+  /* 统计 - 2x2紧凑 */
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:10px}
+  .stat-card{padding:10px 6px;border-radius:10px}
+  .stat-card .val{font-size:22px}
+  .stat-card .lbl{font-size:9px;margin-top:2px}
+  /* 区块 */
+  .sec{padding:12px;margin-bottom:10px;border-radius:12px}
+  .sec h2{font-size:13px;margin-bottom:10px;padding-bottom:8px}
+  /* 算法 - 3列 */
+  .algo-grid{grid-template-columns:repeat(3,1fr);gap:6px;overflow-x:auto}
+  .algo-item{padding:10px 6px;border-radius:10px}
+  .algo-item .an{font-size:11px}
+  .algo-item .ad{font-size:9px;line-height:1.3;margin-bottom:4px}
+  .algo-item .aa{font-size:18px}
+  .algo-item .ai{font-size:8px}
+  /* 回测表格 */
+  .tb{max-height:400px}
+  table{font-size:9px}
+  th{padding:6px 3px;font-size:9px}
+  td{padding:5px 3px;font-size:9px}
+  .ap{font-size:8px}
+  .algo-tag{font-size:7px;padding:1px 3px}
+  /* 安全 */
+  .sg{grid-template-columns:repeat(2,1fr);gap:5px}
+  .si{padding:7px 10px;font-size:10px;border-radius:6px}
+  /* 底部 */
+  .footer{font-size:9px;padding:12px 8px}
+  .footer div:first-child{font-size:12px!important}
+}
 </style></head><body><div class="c">
 
 <div class="header">
@@ -64,25 +113,37 @@ tr:hover td{background:#1e293b}
 
 <div class="pred-section">
 <div class="pred-card" style="border-color:#8b5cf6">
+    <div class="pred-left">
     <div class="algo-badge" style="background:#8b5cf6">DIGIT</div>
-    <div class="algo-name">数字投影</div>
     <div class="pred-num">14</div>
+    </div>
+    <div class="pred-right">
+    <div class="algo-name">数字投影</div>
     <div class="pred-info">遗漏45期 | f100=3 | f50=1</div>
-    <div style="font-size:9px;color:#f87171;margin-top:2px">唤醒史: 5次</div>
+    <div class="pred-wake">唤醒史: 5次</div>
+    </div>
 </div>
 <div class="pred-card" style="border-color:#f59e0b">
+    <div class="pred-left">
     <div class="algo-badge" style="background:#f59e0b">MOM</div>
-    <div class="algo-name">数字动量</div>
     <div class="pred-num">01</div>
+    </div>
+    <div class="pred-right">
+    <div class="algo-name">数字动量</div>
     <div class="pred-info">遗漏107期 | f100=0 | f50=0</div>
-    <div style="font-size:9px;color:#f87171;margin-top:2px">唤醒史: 4次</div>
+    <div class="pred-wake">唤醒史: 4次</div>
+    </div>
 </div>
 <div class="pred-card" style="border-color:#ef4444">
+    <div class="pred-left">
     <div class="algo-badge" style="background:#ef4444">WAKEUP</div>
-    <div class="algo-name">唤醒检测</div>
     <div class="pred-num">38</div>
+    </div>
+    <div class="pred-right">
+    <div class="algo-name">唤醒检测</div>
     <div class="pred-info">遗漏51期 | f100=3 | f50=0</div>
-    <div style="font-size:9px;color:#f87171;margin-top:2px">唤醒史: 5次</div>
+    <div class="pred-wake">唤醒史: 5次</div>
+    </div>
 </div>
 </div>
 <div class="stats-grid">
@@ -223,7 +284,7 @@ tr:hover td{background:#1e293b}
 <div class="si">✦ 1320种组合暴力验证</div>
 </div></div>
 <div class="footer">
-<div style="font-size:14px;color:#94a3b8;margin-bottom:8px">📱 手机访问: <b>http://192.168.3.103:8080</b></div>
+<div style="font-size:14px;color:#94a3b8;margin-bottom:8px">☁ 纯云端 · 永久免费 · 每日21:30自动更新</div>
 2026-06-22 06:02:38 | V12 DIGIT + MOM + WAKEUP | 每5分钟自动刷新<br>
 版本历程: V7(87%) → V8(88%) → V9(90%) → V10(92%) → V10.1(93%) → <b>V12(95%)</b>
 </div>

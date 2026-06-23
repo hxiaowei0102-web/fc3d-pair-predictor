@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-06-22 21:39:21",
+  "generated_at": "2026-06-23 23:17:09",
   "version": "12.0.0-auto",
-  "total_draws": 1006,
+  "total_draws": 1007,
   "latest": {
-    "issue": "2026163",
-    "digits": "537"
+    "issue": "2026164",
+    "digits": "690"
   },
-  "next_issue": "2026164",
+  "next_issue": "2026165",
   "predictions": [
     {
       "pair": [
@@ -17,8 +17,8 @@
       "algo": "DIGIT",
       "algo_cn": "数字投影",
       "tier": "D1",
-      "last_seen": 46,
-      "global_rate": 5.37,
+      "last_seen": 47,
+      "global_rate": 5.36,
       "freq_30": 0,
       "freq_50": 1,
       "freq_60": 1,
@@ -41,7 +41,7 @@
       "algo": "MOM",
       "algo_cn": "数字动量",
       "tier": "M1",
-      "last_seen": 108,
+      "last_seen": 109,
       "global_rate": 4.97,
       "freq_30": 0,
       "freq_50": 0,
@@ -64,7 +64,7 @@
       "algo": "WAKEUP",
       "algo_cn": "唤醒检测",
       "tier": "W1",
-      "last_seen": 52,
+      "last_seen": 53,
       "global_rate": 4.77,
       "freq_30": 0,
       "freq_50": 0,
@@ -98,6 +98,34 @@
       "WAKEUP": 98.0
     },
     "results": [
+      {
+        "issue": "2026164",
+        "digits": "690",
+        "actual_pairs": [
+          "06",
+          "09",
+          "69"
+        ],
+        "predictions": [
+          {
+            "pair": "14",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
       {
         "issue": "2026163",
         "digits": "537",
@@ -2800,34 +2828,6 @@
           },
           {
             "pair": "08",
-            "algo": "MOM",
-            "correct": true
-          },
-          {
-            "pair": "78",
-            "algo": "WAKEUP",
-            "correct": true
-          }
-        ],
-        "hit": 3,
-        "all_correct": true
-      },
-      {
-        "issue": "2026064",
-        "digits": "604",
-        "actual_pairs": [
-          "04",
-          "06",
-          "46"
-        ],
-        "predictions": [
-          {
-            "pair": "08",
-            "algo": "DIGIT",
-            "correct": true
-          },
-          {
-            "pair": "38",
             "algo": "MOM",
             "correct": true
           },

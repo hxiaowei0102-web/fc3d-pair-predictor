@@ -6,12 +6,12 @@ on:
     paths:
       - 'predict_v12.py'
       - 'auto_predict.py'
-      - 'index.html'
-      - 'prediction_v12.json'
-      - 'history.csv'
+      - 'build_html.py'
   schedule:
-    # 每天北京时间 21:30 (UTC 13:30)
+    # 每天北京时间 21:30 (UTC 13:30) - 主运行
     - cron: '30 13 * * *'
+    # 每天北京时间 22:15 (UTC 14:15) - 备份运行，防止主运行被跳过
+    - cron: '15 14 * * *'
   workflow_dispatch:  # 手动触发
 
 jobs:
@@ -21,38 +21,38 @@ jobs:
       contents: write
       pages: write
       id-token: write
-    
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
-      
+
       - name: 安装Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: 安装依赖
         run: pip install numpy
-      
+
       - name: 运行预测
         run: python auto_predict.py
-      
+
       - name: 提交更新
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html prediction_v12.json
-          git diff --staged --quiet || git commit -m "🔮 自动预测 $(date +%Y%m%d)"
+          git add index.html prediction_v12.json history.csv predict_v12.py
+          git diff --staged --quiet || git commit -m "🤖 自动预测 $(date +%Y%m%d-%H%M)"
           git push
-      
+
       - name: 部署到GitHub Pages
         uses: actions/configure-pages@v4
-      
+
       - name: 上传构建产物
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
-      
+
       - name: 发布Pages
         id: deployment
         uses: actions/deploy-pages@v4

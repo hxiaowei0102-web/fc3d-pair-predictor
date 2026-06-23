@@ -10,29 +10,79 @@ from datetime import datetime
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 def fetch_latest_data():
-    """尝试从福彩API获取最新数据"""
-    try:
-        url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
-        req = urllib.request.Request(url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Referer': 'https://www.cwl.gov.cn/'
-        })
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
+    """多源API获取最新数据，带重试和回退"""
+    import time
+    
+    # API源列表（按优先级）
+    api_sources = [
+        {
+            'name': '官网',
+            'url': 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200',
+            'headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'zh-CN,zh;q=0.9',
+                'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
+                'Origin': 'https://www.cwl.gov.cn',
+            }
+        },
+        {
+            'name': '官网备用',
+            'url': 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200&pageNo=1&pageSize=200',
+            'headers': {
+                'User-Agent': 'Mozilla/5.0',
+                'Referer': 'https://www.cwl.gov.cn/',
+                'Accept': '*/*',
+            }
+        },
+        {
+            'name': '灰鸟API',
+            'url': 'http://152.136.21.34:8000/api/fc3d/latest?count=200',
+            'headers': {'User-Agent': 'Mozilla/5.0'},
+        },
+        {
+            'name': '接口盒子',
+            'url': 'https://api.jiekouhezi.com/v1/fc3d/history?count=200',
+            'headers': {'User-Agent': 'Mozilla/5.0'},
+        },
+    ]
+    
+    for src in api_sources:
+        for attempt in range(2):  # 每个源重试2次
+            try:
+                if attempt > 0:
+                    time.sleep(5)  # 重试前等待5秒
+                    
+                req = urllib.request.Request(src['url'], headers=src['headers'])
+                with urllib.request.urlopen(req, timeout=20) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                
+                new_draws = []
+                rows = data.get('result', data.get('data', []))
+                if isinstance(rows, dict):
+                    rows = rows.get('list', rows.get('records', []))
+                if not isinstance(rows, list):
+                    rows = [rows] if rows else []
+                    
+                for row in rows:
+                    issue = str(row.get('code', row.get('issue', '')))
+                    red = str(row.get('red', row.get('number', row.get('openCode', '')))).replace(',', ' ').strip()
+                    parts = red.split()
+                    if len(parts) >= 3 and issue:
+                        new_draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+                
+                if new_draws:
+                    print(f"[API] {src['name']} 获取{len(new_draws)}条 ✓")
+                    return new_draws
+                    
+            except Exception as e:
+                err = str(e)[:60]
+                if attempt == 0:
+                    print(f"[API] {src['name']} 失败: {err}, 重试中...")
         
-        new_draws = []
-        for row in data.get('result', data.get('data', [])):
-            issue = str(row.get('code', row.get('issue', '')))
-            red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
-            parts = red.split()
-            if len(parts) >= 3 and issue:
-                new_draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
-        
-        if new_draws:
-            print(f"[API] 获取{len(new_draws)}条最新数据")
-            return new_draws
-    except Exception as e:
-        print(f"[API] 获取失败: {e}")
+        print(f"[API] {src['name']} 最终失败")
+    
+    print("[API] 所有源均失败，使用本地CSV数据")
     return None
 
 def merge_data(existing, new_draws):

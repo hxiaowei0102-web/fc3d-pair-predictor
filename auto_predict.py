@@ -113,10 +113,39 @@ def run_prediction():
     )
     if result.stdout: print(result.stdout.strip())
     if result.stderr: print(result.stderr.strip()[:200])
-
+    
+    # 7. 同步刷新兜底数据: 更新history.csv + 硬编码EM字符串
+    #    确保即使API全挂, 硬编码数据也是最新的
+    try:
+        # 7a. 更新 history.csv 兜底
+        csv_path = os.path.join(BASE, 'history.csv')
+        with open(csv_path, 'w', encoding='utf-8') as f:
+            f.write('issue,date,digits\n')
+            for d in history:
+                digits_str = ''.join(str(x) for x in d['digits'])
+                f.write(f"{d['issue']},,{digits_str}\n")
+        
+        # 7b. 更新 predict_v12.py 硬编码EM (终极兜底)
+        import re
+        em_parts = []
+        for d in history:
+            digits_str = ''.join(str(x) for x in d['digits'])
+            em_parts.append(f"{d['issue']},{digits_str}")
+        new_em = ' '.join(em_parts)
+        
+        v12_path = os.path.join(BASE, 'predict_v12.py')
+        with open(v12_path, 'r', encoding='utf-8') as f:
+            v12_code = f.read()
+        new_v12_code = re.sub(r'EM = "[^"]*"', f'EM = "{new_em}"', v12_code)
+        if new_v12_code != v12_code:
+            with open(v12_path, 'w', encoding='utf-8') as f:
+                f.write(new_v12_code)
+            print(f"[兜底] 已刷新硬编码数据: {len(history)}期")
+    except Exception as e:
+        print(f"[兜底] 更新失败(不影响预测): {str(e)[:80]}")
     
     return output
 
 if __name__ == '__main__':
     run_prediction()
-    print("\n✓ 自动预测完成")
+    print("\n自动预测完成")

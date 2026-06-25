@@ -40,3 +40,6 @@ predict_v18.py
 predict_v19.py
 predict_v20.py
 predict_v20_fixed.py
+
+# GitHub Pages deploy artifact
+_site/

@@ -25,21 +25,61 @@ def get_pairs(digits):
     if b != c: s.add(tuple(sorted([b, c])))
     return s
 
-def load_all_data():
+def _fetch_official_api():
+    """从官网API拉取数据 — 支持urllib和curl双引擎"""
+    url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
     draws = []
+    
+    # 方法1: urllib
     try:
-        url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.cwl.gov.cn/'})
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+            'Referer': 'https://www.cwl.gov.cn/'
+        })
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode('utf-8'))
         for row in data.get('result', data.get('data', [])):
             issue = str(row.get('code', row.get('issue', '')))
             red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
             parts = red.split()
-            if len(parts) >= 3:
+            if len(parts) >= 3 and issue:
                 draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
-        print(f"[API] {len(draws)}条")
-    except: pass
+        if draws:
+            print(f"[API-urllib] {len(draws)}条 ✓")
+            return draws
+    except Exception as e:
+        print(f"[API-urllib] 失败: {str(e)[:60]}")
+    
+    # 方法2: curl (GitHub Actions runner更可靠)
+    try:
+        import subprocess
+        result = subprocess.run([
+            'curl', '-s', '--max-time', '20',
+            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            '-H', 'Accept: application/json',
+            '-H', 'Referer: https://www.cwl.gov.cn/',
+            url
+        ], capture_output=True, text=True, timeout=25)
+        if result.returncode == 0 and result.stdout.strip():
+            data = json.loads(result.stdout)
+            for row in data.get('result', data.get('data', [])):
+                issue = str(row.get('code', row.get('issue', '')))
+                red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
+                parts = red.split()
+                if len(parts) >= 3 and issue:
+                    draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+            if draws:
+                print(f"[API-curl] {len(draws)}条 ✓")
+                return draws
+    except Exception as e:
+        print(f"[API-curl] 失败: {str(e)[:60]}")
+    
+    return []
+
+def load_all_data():
+    draws = _fetch_official_api()
+    print(f"[数据源] 官网API: {len(draws)}条")
 
     # 尝试多个可能的CSV路径
     csv_paths = [

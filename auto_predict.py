@@ -4,96 +4,105 @@
 用法: python auto_predict.py
 可被定时任务调用
 """
-import json, os, sys, urllib.request, urllib.error
+import json, os, sys, urllib.request, urllib.error, subprocess, time, re
 from datetime import datetime
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 
-def fetch_latest_data():
-    """多源API获取最新数据，带重试和回退"""
-    import time
+def fetch_via_curl(url, timeout=30):
+    """用curl命令行获取JSON数据 (GitHub Actions runner更可靠)"""
+    try:
+        result = subprocess.run([
+            'curl', '-s', '--max-time', str(timeout),
+            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            '-H', 'Accept: application/json, text/plain, */*',
+            '-H', 'Accept-Language: zh-CN,zh;q=0.9',
+            '-H', 'Referer: https://www.cwl.gov.cn/',
+            url
+        ], capture_output=True, text=True, timeout=timeout+5)
+        if result.returncode == 0 and result.stdout.strip():
+            return json.loads(result.stdout)
+        if result.stderr:
+            print(f"  [curl stderr] {result.stderr[:100]}")
+    except Exception as e:
+        print(f"  [curl异常] {str(e)[:80]}")
+    return None
+
+def fetch_via_urllib(url, timeout=20):
+    """用urllib获取JSON数据"""
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+        'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
+        'Origin': 'https://www.cwl.gov.cn',
+    }
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read().decode('utf-8'))
+
+def parse_draws(data):
+    """解析开奖数据"""
+    new_draws = []
+    rows = data.get('result', data.get('data', []))
+    if isinstance(rows, dict):
+        rows = rows.get('list', rows.get('records', []))
+    if not isinstance(rows, list):
+        rows = [rows] if rows else []
     
-    # API源列表（按优先级）
-    api_sources = [
-        {
-            'name': '官网',
-            'url': 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200',
-            'headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'application/json, text/plain, */*',
-                'Accept-Language': 'zh-CN,zh;q=0.9',
-                'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
-                'Origin': 'https://www.cwl.gov.cn',
-            }
-        },
-        {
-            'name': '官网备用',
-            'url': 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200&pageNo=1&pageSize=200',
-            'headers': {
-                'User-Agent': 'Mozilla/5.0',
-                'Referer': 'https://www.cwl.gov.cn/',
-                'Accept': '*/*',
-            }
-        },
-        {
-            'name': '灰鸟API',
-            'url': 'http://152.136.21.34:8000/api/fc3d/latest?count=200',
-            'headers': {'User-Agent': 'Mozilla/5.0'},
-        },
-        {
-            'name': '接口盒子',
-            'url': 'https://api.jiekouhezi.com/v1/fc3d/history?count=200',
-            'headers': {'User-Agent': 'Mozilla/5.0'},
-        },
+    for row in rows:
+        issue = str(row.get('code', row.get('issue', '')))
+        red = str(row.get('red', row.get('number', row.get('openCode', '')))).replace(',', ' ').strip()
+        parts = red.split()
+        if len(parts) >= 3 and issue:
+            new_draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+    return new_draws
+
+def fetch_latest_data():
+    """多源API获取最新数据 — curl+urllib双引擎"""
+    
+    OFFICIAL_URL = 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200'
+    
+    fetch_methods = [
+        ('curl→官网', lambda: fetch_via_curl(OFFICIAL_URL)),
+        ('urllib→官网', lambda: fetch_via_urllib(OFFICIAL_URL)),
+        ('curl→官网(备用)', lambda: fetch_via_curl(OFFICIAL_URL + '&pageNo=1&pageSize=200')),
+        ('curl→灰鸟API', lambda: fetch_via_curl('http://152.136.21.34:8000/api/fc3d/latest?count=200')),
     ]
     
-    for src in api_sources:
-        for attempt in range(2):  # 每个源重试2次
+    for name, fetcher in fetch_methods:
+        for attempt in range(2):
             try:
                 if attempt > 0:
-                    time.sleep(5)  # 重试前等待5秒
-                    
-                req = urllib.request.Request(src['url'], headers=src['headers'])
-                with urllib.request.urlopen(req, timeout=20) as resp:
-                    data = json.loads(resp.read().decode('utf-8'))
-                
-                new_draws = []
-                rows = data.get('result', data.get('data', []))
-                if isinstance(rows, dict):
-                    rows = rows.get('list', rows.get('records', []))
-                if not isinstance(rows, list):
-                    rows = [rows] if rows else []
-                    
-                for row in rows:
-                    issue = str(row.get('code', row.get('issue', '')))
-                    red = str(row.get('red', row.get('number', row.get('openCode', '')))).replace(',', ' ').strip()
-                    parts = red.split()
-                    if len(parts) >= 3 and issue:
-                        new_draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
-                
-                if new_draws:
-                    print(f"[API] {src['name']} 获取{len(new_draws)}条 ✓")
-                    return new_draws
-                    
+                    time.sleep(5)
+                data = fetcher()
+                if data:
+                    new_draws = parse_draws(data)
+                    if new_draws:
+                        print(f"[API] {name} 获取{len(new_draws)}条 ✓")
+                        return new_draws
+                    else:
+                        print(f"[API] {name} 返回空数据")
             except Exception as e:
-                err = str(e)[:60]
+                err = str(e)[:80]
                 if attempt == 0:
-                    print(f"[API] {src['name']} 失败: {err}, 重试中...")
-        
-        print(f"[API] {src['name']} 最终失败")
+                    print(f"[API] {name} 失败: {err}, 重试...")
+        print(f"[API] {name} 最终失败")
     
-    print("[API] 所有源均失败，使用本地CSV数据")
+    print("[API] 所有源均失败，使用现有数据")
     return None
 
 def merge_data(existing, new_draws):
     """合并新旧数据,去重排序"""
     seen = set(d['issue'] for d in existing)
+    new_count = 0
     for d in new_draws:
         if d['issue'] not in seen:
             seen.add(d['issue'])
             existing.append(d)
+            new_count += 1
     existing.sort(key=lambda x: x['issue'])
-    print(f"[合并] 总计{len(existing)}期")
+    print(f"[合并] 新增{new_count}期, 总计{len(existing)}期")
     return existing
 
 def run_prediction():
@@ -155,7 +164,6 @@ def run_prediction():
     print(f"\n[JSON] {json_path}")
     
     # 6. 构建HTML
-    import subprocess
     result = subprocess.run(
         [sys.executable, os.path.join(BASE, 'build_html.py')],
         capture_output=True, text=True, cwd=BASE, timeout=30,
@@ -165,7 +173,6 @@ def run_prediction():
     if result.stderr: print(result.stderr.strip()[:200])
     
     # 7. 同步刷新兜底数据: 更新history.csv + 硬编码EM字符串
-    #    确保即使API全挂, 硬编码数据也是最新的
     try:
         # 7a. 更新 history.csv 兜底
         csv_path = os.path.join(BASE, 'history.csv')
@@ -176,7 +183,6 @@ def run_prediction():
                 f.write(f"{d['issue']},,{digits_str}\n")
         
         # 7b. 更新 predict_v12.py 硬编码EM (终极兜底)
-        import re
         em_parts = []
         for d in history:
             digits_str = ''.join(str(x) for x in d['digits'])

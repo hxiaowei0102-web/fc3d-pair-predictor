@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-25 10:00:36",
+  "generated_at": "2026-06-25 02:03:20",
   "version": "12.0.0-auto",
   "total_draws": 1008,
   "latest": {
@@ -80,6 +80,14 @@
       ]
     }
   ],
+  "algorithm": {
+    "name": "V12 DIGIT→MOM→WAKEUP",
+    "algorithms": {
+      "DIGIT": "数字投影: 指数衰减数字热度，6冷池选对",
+      "MOM": "数字动量: 避热号+冷对优先",
+      "WAKEUP": "唤醒检测: 识别长冷后突现模式"
+    }
+  },
   "backtest": {
     "total_periods": 100,
     "correct": 95,

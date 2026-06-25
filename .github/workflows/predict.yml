@@ -1,19 +1,12 @@
 name: 福彩3D每日预测
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'predict_v12.py'
-      - 'auto_predict.py'
-      - 'build_html.py'
   schedule:
     # 三重备份: 北京时间 22:00 / 23:30 / 次日01:00
-    # 3次机会兜底，确保最早获取当晚开奖数据
     - cron: '0 14 * * *'   # UTC 14:00 = 北京 22:00
     - cron: '30 15 * * *'  # UTC 15:30 = 北京 23:30
     - cron: '0 17 * * *'   # UTC 17:00 = 北京 01:00
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
 
 jobs:
   predict-and-deploy:
@@ -22,6 +15,11 @@ jobs:
       contents: write
       pages: write
       id-token: write
+
+    # 部署环境
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: 检出代码
@@ -36,24 +34,34 @@ jobs:
         run: pip install numpy
 
       - name: 运行预测
-        run: python auto_predict.py
+        run: |
+          echo "=== 开始预测 $(date '+%Y-%m-%d %H:%M:%S') ==="
+          python auto_predict.py 2>&1
+          echo "=== 预测完成 ==="
 
-      - name: 提交更新
+      - name: 准备部署文件
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp prediction_v12.json _site/
+          ls -la _site/
+
+      - name: 配置Pages
+        uses: actions/configure-pages@v4
+
+      - name: 上传部署产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: 发布到Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: 提交源码变更
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html prediction_v12.json history.csv predict_v12.py
           git diff --staged --quiet || git commit -m "🤖 自动预测 $(date +%Y%m%d-%H%M)"
-          git push
-
-      - name: 部署到GitHub Pages
-        uses: actions/configure-pages@v4
-
-      - name: 上传构建产物
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-
-      - name: 发布Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          git push origin main

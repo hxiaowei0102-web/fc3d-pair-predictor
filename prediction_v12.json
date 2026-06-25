@@ -1,23 +1,46 @@
 {
-  "generated_at": "2026-06-25 01:54:20",
+  "generated_at": "2026-06-25 10:00:36",
   "version": "12.0.0-auto",
-  "total_draws": 1007,
+  "total_draws": 1008,
   "latest": {
-    "issue": "2026164",
-    "digits": "690"
+    "issue": "2026165",
+    "digits": "424"
   },
-  "next_issue": "2026165",
+  "next_issue": "2026166",
   "predictions": [
+    {
+      "pair": [
+        0,
+        1
+      ],
+      "pair_str": "01",
+      "algo": "DIGIT",
+      "algo_cn": "数字投影",
+      "tier": "D1",
+      "last_seen": 110,
+      "global_rate": 4.96,
+      "freq_30": 0,
+      "freq_50": 0,
+      "freq_60": 0,
+      "freq_80": 0,
+      "freq_100": 0,
+      "wakeup_history": [
+        48,
+        76,
+        47,
+        65
+      ]
+    },
     {
       "pair": [
         1,
         4
       ],
       "pair_str": "14",
-      "algo": "DIGIT",
-      "algo_cn": "数字投影",
-      "tier": "D1",
-      "last_seen": 47,
+      "algo": "MOM",
+      "algo_cn": "数字动量",
+      "tier": "M1",
+      "last_seen": 48,
       "global_rate": 5.36,
       "freq_30": 0,
       "freq_50": 1,
@@ -34,29 +57,6 @@
     },
     {
       "pair": [
-        0,
-        1
-      ],
-      "pair_str": "01",
-      "algo": "MOM",
-      "algo_cn": "数字动量",
-      "tier": "M1",
-      "last_seen": 109,
-      "global_rate": 4.97,
-      "freq_30": 0,
-      "freq_50": 0,
-      "freq_60": 0,
-      "freq_80": 0,
-      "freq_100": 0,
-      "wakeup_history": [
-        48,
-        76,
-        47,
-        65
-      ]
-    },
-    {
-      "pair": [
         3,
         8
       ],
@@ -64,8 +64,8 @@
       "algo": "WAKEUP",
       "algo_cn": "唤醒检测",
       "tier": "W1",
-      "last_seen": 53,
-      "global_rate": 4.77,
+      "last_seen": 54,
+      "global_rate": 4.76,
       "freq_30": 0,
       "freq_50": 0,
       "freq_60": 1,
@@ -80,14 +80,6 @@
       ]
     }
   ],
-  "algorithm": {
-    "name": "V12 DIGIT→MOM→WAKEUP",
-    "algorithms": {
-      "DIGIT": "数字投影: 指数衰减数字热度，6冷池选对",
-      "MOM": "数字动量: 避热号+冷对优先",
-      "WAKEUP": "唤醒检测: 识别长冷后突现模式"
-    }
-  },
   "backtest": {
     "total_periods": 100,
     "correct": 95,
@@ -98,6 +90,32 @@
       "WAKEUP": 98.0
     },
     "results": [
+      {
+        "issue": "2026165",
+        "digits": "424",
+        "actual_pairs": [
+          "24"
+        ],
+        "predictions": [
+          {
+            "pair": "14",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "01",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "38",
+            "algo": "WAKEUP",
+            "correct": true
+          }
+        ],
+        "hit": 3,
+        "all_correct": true
+      },
       {
         "issue": "2026164",
         "digits": "690",
@@ -2791,34 +2809,6 @@
           "34",
           "39",
           "49"
-        ],
-        "predictions": [
-          {
-            "pair": "38",
-            "algo": "DIGIT",
-            "correct": true
-          },
-          {
-            "pair": "08",
-            "algo": "MOM",
-            "correct": true
-          },
-          {
-            "pair": "78",
-            "algo": "WAKEUP",
-            "correct": true
-          }
-        ],
-        "hit": 3,
-        "all_correct": true
-      },
-      {
-        "issue": "2026065",
-        "digits": "057",
-        "actual_pairs": [
-          "05",
-          "07",
-          "57"
         ],
         "predictions": [
           {

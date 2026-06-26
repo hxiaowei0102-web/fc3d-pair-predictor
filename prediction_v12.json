@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-26 09:48:52",
-  "version": "12.0.0",
+  "generated_at": "2026-06-26 01:51:02",
+  "version": "12.0.0-auto",
   "total_draws": 1009,
   "latest": {
     "issue": "2026166",
@@ -84,11 +84,11 @@
     }
   ],
   "algorithm": {
-    "name": "V12 DIGIT-MOM-WAKEUP",
+    "name": "V12 DIGIT→MOM→WAKEUP",
     "algorithms": {
-      "DIGIT": "数字投影",
-      "MOM": "数字动量",
-      "WAKEUP": "唤醒检测"
+      "DIGIT": "数字投影: 指数衰减数字热度，6冷池选对",
+      "MOM": "数字动量: 避热号+冷对优先",
+      "WAKEUP": "唤醒检测: 识别长冷后突现模式"
     }
   },
   "backtest": {

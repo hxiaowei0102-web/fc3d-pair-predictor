@@ -11,9 +11,21 @@ V12 预测引擎 — DIGIT→MOM→WAKEUP = 95%
 - 唤醒模式检测仅基于训练数据
 - 暴力搜索1320种组合验证
 """
-import json, os, sys, urllib.request, urllib.error
+import json, os, sys, urllib.request, urllib.error, re
 from collections import defaultdict, Counter
 from datetime import datetime
+
+try:
+    import requests as _requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
+
+try:
+    import cloudscraper
+    HAS_SCRAPER = True
+except ImportError:
+    HAS_SCRAPER = False
 
 DIFF_PAIRS = [(i, j) for i in range(10) for j in range(i + 1, 10)]
 
@@ -26,10 +38,12 @@ def get_pairs(digits):
     return s
 
 def _fetch_official_api():
-    """多源API拉取数据 — 5源容错(灰鸟+接口盒子+官网增强+curl)"""
+    """多源API拉取数据 — 8源容错(借鉴五胆码架构)
+    灰鸟 > cjcp.cn > 接口盒子 > c133.com > cloudscraper > 官网requests > kjapi.com > 官网curl
+    """
     draws = []
     
-    # ==== 源1: 灰鸟API (免费/无key/最稳定) ⭐ ====
+    # ==== 源1: 灰鸟API (免费/无key) ⭐ ====
     try:
         url = 'http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=200'
         req = urllib.request.Request(url, headers={
@@ -50,14 +64,29 @@ def _fetch_official_api():
     except Exception as e:
         print(f"[API-灰鸟] 失败: {str(e)[:60]}")
     
-    # ==== 源2: 接口盒子 (多IP, 公共key) ====
+    # ==== 源2: cjcp.cn HTML抓取 (gbk解码) ⭐ ====
+    try:
+        url = 'https://www.cjcp.cn/3dkaijiang/'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            text = resp.read().decode('gbk', errors='replace')
+            pattern = r'福彩3D第(\d{7})期开奖结果</div>\s*<div class="date">(\d{4}-\d{2}-\d{2})[^<]*</div>.*?num-ball[^>]*>(\d)<.*?num-ball[^>]*>(\d)<.*?num-ball[^>]*>(\d)<'
+            matches = re.findall(pattern, text, re.DOTALL)
+            if matches:
+                for issue, date_str, d1, d2, d3 in matches[:30]:
+                    draws.append({'issue': issue, 'digits': [int(d1), int(d2), int(d3)]})
+                print(f"[API-cjcp] {len(draws)}条 ✓")
+                return draws
+    except Exception as e:
+        print(f"[API-cjcp] 失败: {str(e)[:60]}")
+    
+    # ==== 源3: 接口盒子 (多IP, 公共key) ====
     try:
         for ip in ['101.35.2.25', '124.222.204.22', '43.142.65.209']:
             try:
                 url = f'http://{ip}/api/caipiao/fucai3d.php?id=88888888&key=88888888'
                 req = urllib.request.Request(url, headers={
-                    'User-Agent': 'Mozilla/5.0',
-                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json',
                 })
                 with urllib.request.urlopen(req, timeout=12) as resp:
                     data = json.loads(resp.read().decode('utf-8'))
@@ -74,51 +103,93 @@ def _fetch_official_api():
     except Exception as e:
         print(f"[API-接口盒子] 失败: {str(e)[:60]}")
     
-    # ==== 源3: 官网增强urllib ====
-    official_url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
+    # ==== 源4: c133.com HTML抓取 ⭐ ====
     try:
-        import ssl
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        req = urllib.request.Request(official_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
-            'Origin': 'https://www.cwl.gov.cn',
-            'Connection': 'keep-alive',
-            'Sec-Fetch-Dest': 'empty', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'same-origin',
-            'Cache-Control': 'no-cache',
-        })
-        with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
-            raw = resp.read()
-            if resp.headers.get('Content-Encoding') == 'gzip':
-                import gzip
-                raw = gzip.decompress(raw)
-            data = json.loads(raw.decode('utf-8'))
-        for row in data.get('result', data.get('data', [])):
-            issue = str(row.get('code', row.get('issue', '')))
-            red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
-            parts = red.split()
-            if len(parts) >= 3 and issue:
-                draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
-        if draws:
-            print(f"[API-官网增强] {len(draws)}条 ✓")
-            return draws
+        url = 'http://c133.com/'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            text = resp.read().decode('utf-8', errors='replace')
+            pattern = r'<strong>福彩3D</strong>.*?<td class="td-period">(\d+)</td>.*?ball-blue">(\d)</span>.*?ball-blue">(\d)</span>.*?ball-blue">(\d)</span>'
+            m = re.search(pattern, text, re.DOTALL)
+            if m:
+                issue, d1, d2, d3 = m.group(1), m.group(2), m.group(3), m.group(4)
+                draws.append({'issue': issue, 'digits': [int(d1), int(d2), int(d3)]})
+                print(f"[API-c133] {len(draws)}条 ✓")
+                return draws
     except Exception as e:
-        print(f"[API-官网增强] 失败: {str(e)[:60]}")
+        print(f"[API-c133] 失败: {str(e)[:60]}")
     
-    # ==== 源4: 官网curl ====
+    # ==== 源5: cloudscraper绕过Cloudflare ⭐ ====
+    if HAS_SCRAPER:
+        try:
+            scraper = cloudscraper.create_scraper()
+            url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=10"
+            r = scraper.get(url, timeout=15)
+            if r.status_code == 200:
+                data = r.json()
+                if data.get('state') == 0:
+                    for row in data.get('result', []):
+                        issue = str(row.get('code', ''))
+                        red = str(row.get('red', '')).replace(',', ' ').strip()
+                        parts = red.split()
+                        if len(parts) >= 3 and issue:
+                            draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+                    if draws:
+                        print(f"[API-cloudscraper] {len(draws)}条 ✓")
+                        return draws
+        except Exception as e:
+            print(f"[API-cloudscraper] 失败: {str(e)[:60]}")
+    
+    # ==== 源6: 官网requests ====
+    if HAS_REQUESTS:
+        try:
+            url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
+            r = _requests.get(url, headers={
+                'User-Agent': 'Mozilla/5.0',
+                'Referer': 'https://www.cwl.gov.cn/',
+            }, timeout=10)
+            if r.status_code == 200:
+                data = r.json()
+                if data.get('state') == 0:
+                    for row in data.get('result', []):
+                        issue = str(row.get('code', ''))
+                        red = str(row.get('red', '')).replace(',', ' ').strip()
+                        parts = red.split()
+                        if len(parts) >= 3 and issue:
+                            draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+                    if draws:
+                        print(f"[API-官网requests] {len(draws)}条 ✓")
+                        return draws
+        except Exception as e:
+            print(f"[API-官网requests] 失败: {str(e)[:60]}")
+    
+    # ==== 源7: kjapi.com HTML抓取 ⭐ ====
+    if HAS_REQUESTS:
+        try:
+            today = datetime.now().strftime('%Y-%m-%d')
+            url = f"https://www.kjapi.com/hallhistoryDetail/fc3d/{today}"
+            r = _requests.get(url, headers={
+                'User-Agent': 'Mozilla/5.0 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            }, timeout=15)
+            if r.status_code == 200:
+                issue_match = re.findall(r'(\d{7})', r.text)
+                num_match = re.findall(r'<li[^>]*>(\d)</li>', r.text)
+                if issue_match and len(num_match) >= 3:
+                    draws.append({'issue': issue_match[0], 'digits': [int(n) for n in num_match[:3]]})
+                    print(f"[API-kjapi] {len(draws)}条 ✓")
+                    return draws
+        except Exception as e:
+            print(f"[API-kjapi] 失败: {str(e)[:60]}")
+    
+    # ==== 源8: 官网curl ====
     try:
         import subprocess
+        url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
         result = subprocess.run([
             'curl', '-s', '--max-time', '20',
-            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            '-H', 'User-Agent: Mozilla/5.0',
             '-H', 'Accept: application/json',
-            '-H', 'Referer: https://www.cwl.gov.cn/',
-            official_url
+            url
         ], capture_output=True, text=True, timeout=25)
         if result.returncode == 0 and result.stdout.strip():
             data = json.loads(result.stdout)

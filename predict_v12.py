@@ -26,49 +26,73 @@ def get_pairs(digits):
     return s
 
 def _fetch_official_api():
-    """从官网API拉取数据 — 支持urllib和curl双引擎"""
+    """从官网API拉取数据 — 3引擎容错(增强urllib + curl)"""
     url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
     draws = []
     
-    # 方法1: urllib
-    try:
-        req = urllib.request.Request(url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Referer': 'https://www.cwl.gov.cn/'
-        })
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
-        for row in data.get('result', data.get('data', [])):
+    def parse_rows(data):
+        rows = data.get('result', data.get('data', []))
+        if isinstance(rows, dict):
+            rows = rows.get('list', rows.get('records', []))
+        if not isinstance(rows, list):
+            rows = [rows] if rows else []
+        for row in rows:
             issue = str(row.get('code', row.get('issue', '')))
-            red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
+            red = str(row.get('red', row.get('number', row.get('openCode', '')))).replace(',', ' ').strip()
             parts = red.split()
             if len(parts) >= 3 and issue:
                 draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+    
+    # 方法1: 增强urllib — 完整浏览器头模拟(应对反爬升级)
+    try:
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
+            'Origin': 'https://www.cwl.gov.cn',
+            'Connection': 'keep-alive',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'Cache-Control': 'no-cache',
+        })
+        with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+            raw = resp.read()
+            if resp.headers.get('Content-Encoding') == 'gzip':
+                import gzip
+                raw = gzip.decompress(raw)
+            data = json.loads(raw.decode('utf-8'))
+        parse_rows(data)
         if draws:
-            print(f"[API-urllib] {len(draws)}条 ✓")
+            print(f"[API-增强] {len(draws)}条 ✓")
             return draws
     except Exception as e:
-        print(f"[API-urllib] 失败: {str(e)[:60]}")
+        print(f"[API-增强] 失败: {str(e)[:60]}")
     
-    # 方法2: curl (GitHub Actions runner更可靠)
+    # 方法2: curl (GitHub Actions runner备选)
     try:
         import subprocess
         result = subprocess.run([
             'curl', '-s', '--max-time', '20',
-            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            '-H', 'Accept: application/json',
-            '-H', 'Referer: https://www.cwl.gov.cn/',
+            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+            '-H', 'Accept: application/json, text/javascript, */*; q=0.01',
+            '-H', 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            '-H', 'Referer: https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
+            '-H', 'Origin: https://www.cwl.gov.cn',
+            '-H', 'Sec-Fetch-Dest: empty',
+            '-H', 'Sec-Fetch-Mode: cors',
+            '-H', 'Sec-Fetch-Site: same-origin',
             url
         ], capture_output=True, text=True, timeout=25)
         if result.returncode == 0 and result.stdout.strip():
             data = json.loads(result.stdout)
-            for row in data.get('result', data.get('data', [])):
-                issue = str(row.get('code', row.get('issue', '')))
-                red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
-                parts = red.split()
-                if len(parts) >= 3 and issue:
-                    draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+            parse_rows(data)
             if draws:
                 print(f"[API-curl] {len(draws)}条 ✓")
                 return draws

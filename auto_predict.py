@@ -2,48 +2,53 @@
 """
 自动预测管线 — 每日拉数据→预测→更新HTML
 用法: python auto_predict.py
-可被定时任务调用
+数据源(v12.3 借鉴五胆码): 灰鸟 > cjcp.cn > 接口盒子 > c133.com > cloudscraper > 官网curl > kjapi.com > 硬编码兜底
 """
 import json, os, sys, urllib.request, urllib.error, subprocess, time, re
 from datetime import datetime
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 
+# 可选依赖
+try:
+    import cloudscraper
+    HAS_CLOUDSCRAPER = True
+except ImportError:
+    HAS_CLOUDSCRAPER = False
+
+try:
+    import requests as _requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
+
+# ============================================================
+# 通用工具
+# ============================================================
+
 def fetch_via_curl(url, timeout=30):
-    """用curl命令行获取JSON数据 (GitHub Actions runner更可靠)"""
+    """用curl命令行获取JSON数据"""
     try:
         result = subprocess.run([
             'curl', '-s', '--max-time', str(timeout),
             '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             '-H', 'Accept: application/json, text/plain, */*',
             '-H', 'Accept-Language: zh-CN,zh;q=0.9',
-            '-H', 'Referer: https://www.cwl.gov.cn/',
             url
         ], capture_output=True, text=True, timeout=timeout+5)
         if result.returncode == 0 and result.stdout.strip():
             return json.loads(result.stdout)
-        if result.stderr:
-            print(f"  [curl stderr] {result.stderr[:100]}")
     except Exception as e:
         print(f"  [curl异常] {str(e)[:80]}")
     return None
 
-def fetch_via_urllib(url, timeout=20):
-    """用urllib获取JSON数据"""
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
-        'Origin': 'https://www.cwl.gov.cn',
-    }
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode('utf-8'))
+# ============================================================
+# 解析器
+# ============================================================
 
 def parse_draws_official(data):
-    """解析官网API数据"""
-    new_draws = []
+    """解析官网API"""
+    draws = []
     rows = data.get('result', data.get('data', []))
     if isinstance(rows, dict):
         rows = rows.get('list', rows.get('records', []))
@@ -54,42 +59,43 @@ def parse_draws_official(data):
         red = str(row.get('red', row.get('number', row.get('openCode', '')))).replace(',', ' ').strip()
         parts = red.split()
         if len(parts) >= 3 and issue:
-            new_draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
-    return new_draws
+            draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+    return draws
 
 def parse_huiniao(data):
-    """解析灰鸟API: {data:{list:[{code,one,two,three}]}}"""
-    new_draws = []
+    """解析灰鸟API"""
+    draws = []
     lst = data.get('data', {}).get('data', {}).get('list', [])
     for row in lst:
         code = str(row.get('code', ''))
         one, two, three = row.get('one'), row.get('two'), row.get('three')
         if code and one is not None and two is not None and three is not None:
-            new_draws.append({'issue': code, 'digits': [int(one), int(two), int(three)]})
-    return new_draws
+            draws.append({'issue': code, 'digits': [int(one), int(two), int(three)]})
+    return draws
 
 def parse_apihz(data):
-    """解析接口盒子API: {number:'6|3|1', qihao:'2026167'}"""
-    new_draws = []
+    """解析接口盒子API"""
+    draws = []
     nums = str(data.get('number', '')).split('|')
     qihao = str(data.get('qihao', ''))
     if len(nums) >= 3 and qihao:
         try:
-            new_draws.append({'issue': qihao, 'digits': [int(n) for n in nums[:3]]})
+            draws.append({'issue': qihao, 'digits': [int(n) for n in nums[:3]]})
         except ValueError:
             pass
-    return new_draws
+    return draws
 
-def fetch_huiniao_batch(limit=200):
-    """灰鸟API — 免费,无key,稳定 (最优先)"""
+# ============================================================
+# 源1: 灰鸟API — JSON, 免费, 无key (优先) ⭐
+# ============================================================
+
+def fetch_huiniao(limit=200):
     url = f'http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit={limit}'
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-    }
     try:
-        req = urllib.request.Request(url, headers=headers)
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json',
+        })
         with urllib.request.urlopen(req, timeout=20) as resp:
             data = json.loads(resp.read().decode('utf-8'))
         if data.get('code') == 1:
@@ -98,8 +104,38 @@ def fetch_huiniao_batch(limit=200):
         print(f"  [灰鸟] {str(e)[:60]}")
     return None
 
+# ============================================================
+# 源2: cjcp.cn — 彩经网HTML抓取 (借鉴五胆码) ⭐
+# ============================================================
+
+def fetch_cjcp():
+    """HTML抓取彩经网 — gbk解码, 多期数据"""
+    try:
+        url = 'https://www.cjcp.cn/3dkaijiang/'
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            raw = resp.read()
+            text = raw.decode('gbk', errors='replace')
+            pattern = r'福彩3D第(\d{7})期开奖结果</div>\s*<div class="date">(\d{4}-\d{2}-\d{2})[^<]*</div>.*?num-ball[^>]*>(\d)<.*?num-ball[^>]*>(\d)<.*?num-ball[^>]*>(\d)<'
+            matches = re.findall(pattern, text, re.DOTALL)
+            if matches:
+                draws = []
+                for issue, date_str, d1, d2, d3 in matches[:30]:
+                    draws.append({'issue': issue, 'digits': [int(d1), int(d2), int(d3)]})
+                if draws:
+                    print(f"  [cjcp.cn] ✓ 获取{len(draws)}条, 最新: {draws[0]['issue']}={draws[0]['digits']}")
+                    return draws
+    except Exception as e:
+        print(f"  [cjcp.cn] {str(e)[:60]}")
+    return []
+
+# ============================================================
+# 源3: 接口盒子 — 多IP, 公共key
+# ============================================================
+
 def fetch_apihz():
-    """接口盒子API — 多IP备选, 公共key"""
     urls = [
         'http://101.35.2.25/api/caipiao/fucai3d.php',
         'http://124.222.204.22/api/caipiao/fucai3d.php',
@@ -107,14 +143,12 @@ def fetch_apihz():
         'https://cn.apihz.cn/api/caipiao/fucai3d.php',
     ]
     params = '?id=88888888&key=88888888'
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json',
-    }
     for url in urls:
         try:
-            req = urllib.request.Request(url + params, headers=headers)
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            req = urllib.request.Request(url + params, headers={
+                'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'
+            })
+            with urllib.request.urlopen(req, timeout=12) as resp:
                 data = json.loads(resp.read().decode('utf-8'))
             if data.get('code') == 200:
                 return data
@@ -122,75 +156,158 @@ def fetch_apihz():
             continue
     return None
 
-def fetch_via_urllib_enhanced(url, timeout=20):
-    """增强版urllib — 完整浏览器头"""
+# ============================================================
+# 源4: c133.com — HTML抓取 (借鉴五胆码) ⭐
+# ============================================================
+
+def fetch_c133():
+    """HTML抓取c133.com — 获取最新1条"""
     try:
-        import ssl
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
-            'Origin': 'https://www.cwl.gov.cn',
-            'Connection': 'keep-alive',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'same-origin',
-            'Cache-Control': 'no-cache',
-        }
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
-            raw = resp.read()
-            if resp.headers.get('Content-Encoding') == 'gzip':
-                import gzip
-                raw = gzip.decompress(raw)
-            return json.loads(raw.decode('utf-8'))
-    except Exception:
+        url = 'http://c133.com/'
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            text = resp.read().decode('utf-8', errors='replace')
+            pattern = r'<strong>福彩3D</strong>.*?<td class="td-period">(\d+)</td>.*?ball-blue">(\d)</span>.*?ball-blue">(\d)</span>.*?ball-blue">(\d)</span>'
+            m = re.search(pattern, text, re.DOTALL)
+            if m:
+                issue, d1, d2, d3 = m.group(1), m.group(2), m.group(3), m.group(4)
+                digits = [int(d1), int(d2), int(d3)]
+                print(f"  [c133.com] ✓ {issue}={digits}")
+                return [{'issue': issue, 'digits': digits}]
+    except Exception as e:
+        print(f"  [c133.com] {str(e)[:60]}")
+    return []
+
+# ============================================================
+# 源5: cloudscraper — 绕过Cloudflare (借鉴五胆码) ⭐
+# ============================================================
+
+def fetch_cloudscraper():
+    """cloudscraper绕过Cloudflare访问官网API"""
+    if not HAS_CLOUDSCRAPER:
         return None
+    try:
+        scraper = cloudscraper.create_scraper()
+        url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=10"
+        r = scraper.get(url, timeout=15)
+        if r.status_code == 200:
+            data = r.json()
+            if data.get('state') == 0:
+                draws = parse_draws_official(data)
+                if draws:
+                    print(f"  [cloudscraper] ✓ 获取{len(draws)}条")
+                    return draws
+    except Exception as e:
+        print(f"  [cloudscraper] {str(e)[:60]}")
+    return None
+
+# ============================================================
+# 源6: kjapi.com — HTML抓取 (借鉴五胆码) ⭐
+# ============================================================
+
+def fetch_kjapi():
+    """HTML抓取kjapi.com — 当天开奖数据"""
+    if not HAS_REQUESTS:
+        return []
+    try:
+        today = datetime.now().strftime('%Y-%m-%d')
+        url = f"https://www.kjapi.com/hallhistoryDetail/fc3d/{today}"
+        r = _requests.get(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        }, timeout=15)
+        if r.status_code == 200:
+            issue_match = re.findall(r'(\d{7})', r.text)
+            num_match = re.findall(r'<li[^>]*>(\d)</li>', r.text)
+            if issue_match and len(num_match) >= 3:
+                issue = issue_match[0]
+                digits = [int(n) for n in num_match[:3]]
+                print(f"  [kjapi.com] ✓ {today}: {issue}={digits}")
+                return [{'issue': issue, 'digits': digits}]
+    except Exception as e:
+        print(f"  [kjapi.com] {str(e)[:60]}")
+    return []
+
+# ============================================================
+# 源7: 官网curl + requests (保留作为后备)
+# ============================================================
+
+def fetch_cwl_requests():
+    """requests直连官网"""
+    if not HAS_REQUESTS:
+        return None
+    try:
+        url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
+        r = _requests.get(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Referer': 'https://www.cwl.gov.cn/',
+        }, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            if data.get('state') == 0:
+                draws = parse_draws_official(data)
+                if draws:
+                    print(f"  [官网requests] ✓ 获取{len(draws)}条")
+                    return draws
+    except Exception as e:
+        print(f"  [官网requests] {str(e)[:60]}")
+    return None
+
+# ============================================================
+# 主数据获取 — 8源容错
+# ============================================================
 
 def fetch_latest_data():
-    """多源API获取最新数据 — 5源容错, 优先第三方免费API"""
+    """多源获取最新数据 — 8重保障 (借鉴五胆码架构)"""
     
-    OFFICIAL_URL = 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200'
-    
-    # 优先级排序: 第三方免费API → 官网增强 → 官网原始 → curl备选
-    fetch_sources = [
-        # 源1: 灰鸟API — 免费, 无key, 最稳定 ⭐
-        ('灰鸟API', lambda: fetch_huiniao_batch(200), parse_huiniao),
-        # 源2: 接口盒子 — 多IP备选, 公共key
-        ('接口盒子', lambda: fetch_apihz(), parse_apihz),
-        # 源3: 官网增强 — 完整浏览器头
-        ('官网增强', lambda: fetch_via_urllib_enhanced(OFFICIAL_URL), parse_draws_official),
-        # 源4: 官网curl — GitHub Actions备选
-        ('官网curl', lambda: fetch_via_curl(OFFICIAL_URL), parse_draws_official),
-        # 源5: 官网原始urllib — 最后手段
-        ('官网原始', lambda: fetch_via_urllib(OFFICIAL_URL), parse_draws_official),
+    # 优先级: 第三方稳定 > HTML抓取 > 第三方补位 > cloudscraper > 官网API > 兜底
+    sources = [
+        # ⭐ 第三方免费JSON API (最稳定)
+        ('灰鸟API', fetch_huiniao, parse_huiniao),
+        # ⭐ HTML抓取 (不同域名, 互补)
+        ('cjcp.cn', fetch_cjcp, None),  # None = 直接返回list
+        # 第三方JSON (多IP容错)
+        ('接口盒子', fetch_apihz, parse_apihz),
+        # HTML抓取 (独立站点)
+        ('c133.com', fetch_c133, None),
+        # cloudscraper绕过Cloudflare
+        ('cloudscraper', fetch_cloudscraper, None),
+        # 官网API (requests直连)
+        ('官网requests', fetch_cwl_requests, None),
+        # kjapi.com HTML
+        ('kjapi.com', fetch_kjapi, None),
+        # 官网curl (GitHub Actions备选)
+        ('官网curl', lambda: fetch_via_curl(
+            'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200'
+        ), parse_draws_official),
     ]
     
-    for name, fetcher, parser in fetch_sources:
+    for name, fetcher, parser in sources:
         for attempt in range(2):
             try:
                 if attempt > 0:
-                    time.sleep(3)
+                    time.sleep(2)
                 data = fetcher()
                 if data:
-                    new_draws = parser(data)
-                    if new_draws:
-                        print(f"[API] {name} ✓ 获取{len(new_draws)}条")
-                        return new_draws
+                    if parser is None:
+                        # fetcher返回的已经是draws列表
+                        draws = data
                     else:
-                        print(f"[API] {name} 返回空数据")
+                        draws = parser(data)
+                    if draws:
+                        if parser is None or isinstance(data, list):
+                            print(f"[API] {name} ✓ 获取{len(draws)}条")
+                        return draws
+                    else:
+                        if attempt == 0:
+                            print(f"[API] {name} 返回空数据")
             except Exception as e:
-                err = str(e)[:80]
                 if attempt == 0:
-                    print(f"[API] {name} 失败: {err}, 重试...")
+                    print(f"[API] {name} 失败: {str(e)[:60]}, 重试...")
         print(f"[API] {name} 最终失败")
     
-    print("[API] ⚠ 所有5个数据源均失败，使用硬编码兜底数据")
+    print("[API] ⚠ 全部8源失败，使用硬编码兜底数据")
     return None
 
 def merge_data(existing, new_draws):

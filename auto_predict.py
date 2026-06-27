@@ -58,16 +58,52 @@ def parse_draws(data):
             new_draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
     return new_draws
 
+def fetch_via_urllib_with_cookies(url, timeout=30):
+    """增强版urllib — 模拟完整浏览器请求，绕过反爬"""
+    try:
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
+            'Origin': 'https://www.cwl.gov.cn',
+            'Connection': 'keep-alive',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'Cache-Control': 'no-cache',
+        }
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
+            raw = resp.read()
+            # 尝试解压 gzip
+            if resp.headers.get('Content-Encoding') == 'gzip':
+                import gzip
+                raw = gzip.decompress(raw)
+            return json.loads(raw.decode('utf-8'))
+    except Exception as e:
+        return None
+
 def fetch_latest_data():
-    """多源API获取最新数据 — curl+urllib双引擎"""
+    """多源API获取最新数据 — 5源容错"""
     
     OFFICIAL_URL = 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200'
     
+    # 网易彩票API (对海外IP友好)
+    NETEASE_URL = 'https://caipiao.163.com/award/3d/'
+    
     fetch_methods = [
+        ('增强urllib→官网', lambda: fetch_via_urllib_with_cookies(OFFICIAL_URL)),
         ('curl→官网', lambda: fetch_via_curl(OFFICIAL_URL)),
         ('urllib→官网', lambda: fetch_via_urllib(OFFICIAL_URL)),
-        ('curl→官网(备用)', lambda: fetch_via_curl(OFFICIAL_URL + '&pageNo=1&pageSize=200')),
         ('curl→灰鸟API', lambda: fetch_via_curl('http://152.136.21.34:8000/api/fc3d/latest?count=200')),
+        ('curl→备用', lambda: fetch_via_curl('https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&pageNo=1&pageSize=200')),
     ]
     
     for name, fetcher in fetch_methods:

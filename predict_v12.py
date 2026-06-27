@@ -26,30 +26,62 @@ def get_pairs(digits):
     return s
 
 def _fetch_official_api():
-    """从官网API拉取数据 — 3引擎容错(增强urllib + curl)"""
-    url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
+    """多源API拉取数据 — 5源容错(灰鸟+接口盒子+官网增强+curl)"""
     draws = []
     
-    def parse_rows(data):
-        rows = data.get('result', data.get('data', []))
-        if isinstance(rows, dict):
-            rows = rows.get('list', rows.get('records', []))
-        if not isinstance(rows, list):
-            rows = [rows] if rows else []
-        for row in rows:
-            issue = str(row.get('code', row.get('issue', '')))
-            red = str(row.get('red', row.get('number', row.get('openCode', '')))).replace(',', ' ').strip()
-            parts = red.split()
-            if len(parts) >= 3 and issue:
-                draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+    # ==== 源1: 灰鸟API (免费/无key/最稳定) ⭐ ====
+    try:
+        url = 'http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=200'
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0',
+            'Accept': 'application/json',
+        })
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+        if data.get('code') == 1:
+            for row in data.get('data',{}).get('data',{}).get('list',[]):
+                code = str(row.get('code',''))
+                one, two, three = row.get('one'), row.get('two'), row.get('three')
+                if code and one is not None:
+                    draws.append({'issue': code, 'digits': [int(one), int(two), int(three)]})
+        if draws:
+            print(f"[API-灰鸟] {len(draws)}条 ✓")
+            return draws
+    except Exception as e:
+        print(f"[API-灰鸟] 失败: {str(e)[:60]}")
     
-    # 方法1: 增强urllib — 完整浏览器头模拟(应对反爬升级)
+    # ==== 源2: 接口盒子 (多IP, 公共key) ====
+    try:
+        for ip in ['101.35.2.25', '124.222.204.22', '43.142.65.209']:
+            try:
+                url = f'http://{ip}/api/caipiao/fucai3d.php?id=88888888&key=88888888'
+                req = urllib.request.Request(url, headers={
+                    'User-Agent': 'Mozilla/5.0',
+                    'Accept': 'application/json',
+                })
+                with urllib.request.urlopen(req, timeout=12) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                if data.get('code') == 200:
+                    nums = str(data.get('number','')).split('|')
+                    qihao = str(data.get('qihao',''))
+                    if len(nums) >= 3 and qihao:
+                        draws.append({'issue': qihao, 'digits': [int(n) for n in nums[:3]]})
+                        print(f"[API-接口盒子] {len(draws)}条 ✓")
+                        return draws
+            except Exception:
+                continue
+        print(f"[API-接口盒子] 所有IP失败")
+    except Exception as e:
+        print(f"[API-接口盒子] 失败: {str(e)[:60]}")
+    
+    # ==== 源3: 官网增强urllib ====
+    official_url = "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200"
     try:
         import ssl
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        req = urllib.request.Request(url, headers={
+        req = urllib.request.Request(official_url, headers={
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
@@ -57,9 +89,7 @@ def _fetch_official_api():
             'Referer': 'https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
             'Origin': 'https://www.cwl.gov.cn',
             'Connection': 'keep-alive',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-Dest': 'empty', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Site': 'same-origin',
             'Cache-Control': 'no-cache',
         })
         with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
@@ -68,36 +98,41 @@ def _fetch_official_api():
                 import gzip
                 raw = gzip.decompress(raw)
             data = json.loads(raw.decode('utf-8'))
-        parse_rows(data)
+        for row in data.get('result', data.get('data', [])):
+            issue = str(row.get('code', row.get('issue', '')))
+            red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
+            parts = red.split()
+            if len(parts) >= 3 and issue:
+                draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
         if draws:
-            print(f"[API-增强] {len(draws)}条 ✓")
+            print(f"[API-官网增强] {len(draws)}条 ✓")
             return draws
     except Exception as e:
-        print(f"[API-增强] 失败: {str(e)[:60]}")
+        print(f"[API-官网增强] 失败: {str(e)[:60]}")
     
-    # 方法2: curl (GitHub Actions runner备选)
+    # ==== 源4: 官网curl ====
     try:
         import subprocess
         result = subprocess.run([
             'curl', '-s', '--max-time', '20',
-            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
-            '-H', 'Accept: application/json, text/javascript, */*; q=0.01',
-            '-H', 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            '-H', 'Referer: https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/',
-            '-H', 'Origin: https://www.cwl.gov.cn',
-            '-H', 'Sec-Fetch-Dest: empty',
-            '-H', 'Sec-Fetch-Mode: cors',
-            '-H', 'Sec-Fetch-Site: same-origin',
-            url
+            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            '-H', 'Accept: application/json',
+            '-H', 'Referer: https://www.cwl.gov.cn/',
+            official_url
         ], capture_output=True, text=True, timeout=25)
         if result.returncode == 0 and result.stdout.strip():
             data = json.loads(result.stdout)
-            parse_rows(data)
-            if draws:
-                print(f"[API-curl] {len(draws)}条 ✓")
-                return draws
+            for row in data.get('result', data.get('data', [])):
+                issue = str(row.get('code', row.get('issue', '')))
+                red = str(row.get('red', row.get('number', ''))).replace(',', ' ').strip()
+                parts = red.split()
+                if len(parts) >= 3 and issue:
+                    draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
+        if draws:
+            print(f"[API-官网curl] {len(draws)}条 ✓")
+            return draws
     except Exception as e:
-        print(f"[API-curl] 失败: {str(e)[:60]}")
+        print(f"[API-官网curl] 失败: {str(e)[:60]}")
     
     return []
 

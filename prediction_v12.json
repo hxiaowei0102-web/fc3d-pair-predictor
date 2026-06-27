@@ -1,48 +1,24 @@
 {
-  "generated_at": "2026-06-27 02:54:24",
+  "generated_at": "2026-06-27 17:45:45",
   "version": "12.0.0-auto",
-  "total_draws": 1010,
+  "total_draws": 1011,
   "latest": {
-    "issue": "2026167",
-    "digits": "631"
+    "issue": "2026168",
+    "digits": "130"
   },
-  "next_issue": "2026168",
+  "next_issue": "2026169",
   "predictions": [
-    {
-      "pair": [
-        1,
-        4
-      ],
-      "pair_str": "14",
-      "algo": "DIGIT",
-      "algo_cn": "数字投影",
-      "tier": "D1",
-      "last_seen": 50,
-      "global_rate": 5.35,
-      "freq_30": 0,
-      "freq_50": 0,
-      "freq_60": 1,
-      "freq_80": 3,
-      "freq_100": 3,
-      "wakeup_history": [
-        47,
-        53,
-        51,
-        55,
-        63
-      ]
-    },
     {
       "pair": [
         4,
         7
       ],
       "pair_str": "47",
-      "algo": "MOM",
-      "algo_cn": "数字动量",
-      "tier": "M1",
-      "last_seen": 32,
-      "global_rate": 6.14,
+      "algo": "DIGIT",
+      "algo_cn": "数字投影",
+      "tier": "D1",
+      "last_seen": 33,
+      "global_rate": 6.13,
       "freq_30": 0,
       "freq_50": 2,
       "freq_60": 2,
@@ -60,29 +36,50 @@
     },
     {
       "pair": [
-        0,
-        3
+        1,
+        4
       ],
-      "pair_str": "03",
+      "pair_str": "14",
+      "algo": "MOM",
+      "algo_cn": "数字动量",
+      "tier": "M1",
+      "last_seen": 51,
+      "global_rate": 5.34,
+      "freq_30": 0,
+      "freq_50": 0,
+      "freq_60": 1,
+      "freq_80": 3,
+      "freq_100": 3,
+      "wakeup_history": [
+        47,
+        53,
+        51,
+        55,
+        63
+      ]
+    },
+    {
+      "pair": [
+        1,
+        5
+      ],
+      "pair_str": "15",
       "algo": "WAKEUP",
       "algo_cn": "唤醒检测",
       "tier": "W1",
-      "last_seen": 38,
-      "global_rate": 4.46,
+      "last_seen": 31,
+      "global_rate": 4.75,
       "freq_30": 0,
       "freq_50": 1,
-      "freq_60": 1,
-      "freq_80": 1,
-      "freq_100": 1,
+      "freq_60": 3,
+      "freq_80": 5,
+      "freq_100": 5,
       "wakeup_history": [
-        82,
-        56,
-        40,
-        44,
-        51,
-        43,
-        72,
-        78
+        55,
+        47,
+        42,
+        60,
+        50
       ]
     }
   ],
@@ -96,14 +93,42 @@
   },
   "backtest": {
     "total_periods": 100,
-    "correct": 95,
-    "accuracy": 95.0,
+    "correct": 94,
+    "accuracy": 94.0,
     "algo_accuracy": {
       "DIGIT": 98.0,
       "MOM": 99.0,
-      "WAKEUP": 98.0
+      "WAKEUP": 97.0
     },
     "results": [
+      {
+        "issue": "2026168",
+        "digits": "130",
+        "actual_pairs": [
+          "01",
+          "03",
+          "13"
+        ],
+        "predictions": [
+          {
+            "pair": "14",
+            "algo": "DIGIT",
+            "correct": true
+          },
+          {
+            "pair": "47",
+            "algo": "MOM",
+            "correct": true
+          },
+          {
+            "pair": "03",
+            "algo": "WAKEUP",
+            "correct": false
+          }
+        ],
+        "hit": 2,
+        "all_correct": false
+      },
       {
         "issue": "2026167",
         "digits": "631",
@@ -2802,34 +2827,6 @@
           },
           {
             "pair": "28",
-            "algo": "MOM",
-            "correct": true
-          },
-          {
-            "pair": "78",
-            "algo": "WAKEUP",
-            "correct": true
-          }
-        ],
-        "hit": 3,
-        "all_correct": true
-      },
-      {
-        "issue": "2026068",
-        "digits": "706",
-        "actual_pairs": [
-          "06",
-          "07",
-          "67"
-        ],
-        "predictions": [
-          {
-            "pair": "38",
-            "algo": "DIGIT",
-            "correct": true
-          },
-          {
-            "pair": "08",
             "algo": "MOM",
             "correct": true
           },

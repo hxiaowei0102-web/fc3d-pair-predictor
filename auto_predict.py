@@ -41,15 +41,14 @@ def fetch_via_urllib(url, timeout=20):
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read().decode('utf-8'))
 
-def parse_draws(data):
-    """解析开奖数据"""
+def parse_draws_official(data):
+    """解析官网API数据"""
     new_draws = []
     rows = data.get('result', data.get('data', []))
     if isinstance(rows, dict):
         rows = rows.get('list', rows.get('records', []))
     if not isinstance(rows, list):
         rows = [rows] if rows else []
-    
     for row in rows:
         issue = str(row.get('code', row.get('issue', '')))
         red = str(row.get('red', row.get('number', row.get('openCode', '')))).replace(',', ' ').strip()
@@ -58,14 +57,78 @@ def parse_draws(data):
             new_draws.append({'issue': issue, 'digits': [int(p) for p in parts[:3]]})
     return new_draws
 
-def fetch_via_urllib_with_cookies(url, timeout=30):
-    """增强版urllib — 模拟完整浏览器请求，绕过反爬"""
+def parse_huiniao(data):
+    """解析灰鸟API: {data:{list:[{code,one,two,three}]}}"""
+    new_draws = []
+    lst = data.get('data', {}).get('data', {}).get('list', [])
+    for row in lst:
+        code = str(row.get('code', ''))
+        one, two, three = row.get('one'), row.get('two'), row.get('three')
+        if code and one is not None and two is not None and three is not None:
+            new_draws.append({'issue': code, 'digits': [int(one), int(two), int(three)]})
+    return new_draws
+
+def parse_apihz(data):
+    """解析接口盒子API: {number:'6|3|1', qihao:'2026167'}"""
+    new_draws = []
+    nums = str(data.get('number', '')).split('|')
+    qihao = str(data.get('qihao', ''))
+    if len(nums) >= 3 and qihao:
+        try:
+            new_draws.append({'issue': qihao, 'digits': [int(n) for n in nums[:3]]})
+        except ValueError:
+            pass
+    return new_draws
+
+def fetch_huiniao_batch(limit=200):
+    """灰鸟API — 免费,无key,稳定 (最优先)"""
+    url = f'http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit={limit}'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+    }
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+        if data.get('code') == 1:
+            return data
+    except Exception as e:
+        print(f"  [灰鸟] {str(e)[:60]}")
+    return None
+
+def fetch_apihz():
+    """接口盒子API — 多IP备选, 公共key"""
+    urls = [
+        'http://101.35.2.25/api/caipiao/fucai3d.php',
+        'http://124.222.204.22/api/caipiao/fucai3d.php',
+        'http://43.142.65.209/api/caipiao/fucai3d.php',
+        'https://cn.apihz.cn/api/caipiao/fucai3d.php',
+    ]
+    params = '?id=88888888&key=88888888'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+    }
+    for url in urls:
+        try:
+            req = urllib.request.Request(url + params, headers=headers)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+            if data.get('code') == 200:
+                return data
+        except Exception:
+            continue
+    return None
+
+def fetch_via_urllib_enhanced(url, timeout=20):
+    """增强版urllib — 完整浏览器头"""
     try:
         import ssl
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -82,40 +145,42 @@ def fetch_via_urllib_with_cookies(url, timeout=30):
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
             raw = resp.read()
-            # 尝试解压 gzip
             if resp.headers.get('Content-Encoding') == 'gzip':
                 import gzip
                 raw = gzip.decompress(raw)
             return json.loads(raw.decode('utf-8'))
-    except Exception as e:
+    except Exception:
         return None
 
 def fetch_latest_data():
-    """多源API获取最新数据 — 5源容错"""
+    """多源API获取最新数据 — 5源容错, 优先第三方免费API"""
     
     OFFICIAL_URL = 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&issueCount=200'
     
-    # 网易彩票API (对海外IP友好)
-    NETEASE_URL = 'https://caipiao.163.com/award/3d/'
-    
-    fetch_methods = [
-        ('增强urllib→官网', lambda: fetch_via_urllib_with_cookies(OFFICIAL_URL)),
-        ('curl→官网', lambda: fetch_via_curl(OFFICIAL_URL)),
-        ('urllib→官网', lambda: fetch_via_urllib(OFFICIAL_URL)),
-        ('curl→灰鸟API', lambda: fetch_via_curl('http://152.136.21.34:8000/api/fc3d/latest?count=200')),
-        ('curl→备用', lambda: fetch_via_curl('https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=3d&pageNo=1&pageSize=200')),
+    # 优先级排序: 第三方免费API → 官网增强 → 官网原始 → curl备选
+    fetch_sources = [
+        # 源1: 灰鸟API — 免费, 无key, 最稳定 ⭐
+        ('灰鸟API', lambda: fetch_huiniao_batch(200), parse_huiniao),
+        # 源2: 接口盒子 — 多IP备选, 公共key
+        ('接口盒子', lambda: fetch_apihz(), parse_apihz),
+        # 源3: 官网增强 — 完整浏览器头
+        ('官网增强', lambda: fetch_via_urllib_enhanced(OFFICIAL_URL), parse_draws_official),
+        # 源4: 官网curl — GitHub Actions备选
+        ('官网curl', lambda: fetch_via_curl(OFFICIAL_URL), parse_draws_official),
+        # 源5: 官网原始urllib — 最后手段
+        ('官网原始', lambda: fetch_via_urllib(OFFICIAL_URL), parse_draws_official),
     ]
     
-    for name, fetcher in fetch_methods:
+    for name, fetcher, parser in fetch_sources:
         for attempt in range(2):
             try:
                 if attempt > 0:
-                    time.sleep(5)
+                    time.sleep(3)
                 data = fetcher()
                 if data:
-                    new_draws = parse_draws(data)
+                    new_draws = parser(data)
                     if new_draws:
-                        print(f"[API] {name} 获取{len(new_draws)}条 ✓")
+                        print(f"[API] {name} ✓ 获取{len(new_draws)}条")
                         return new_draws
                     else:
                         print(f"[API] {name} 返回空数据")
@@ -125,7 +190,7 @@ def fetch_latest_data():
                     print(f"[API] {name} 失败: {err}, 重试...")
         print(f"[API] {name} 最终失败")
     
-    print("[API] 所有源均失败，使用现有数据")
+    print("[API] ⚠ 所有5个数据源均失败，使用硬编码兜底数据")
     return None
 
 def merge_data(existing, new_draws):

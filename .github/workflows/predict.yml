@@ -31,7 +31,7 @@ jobs:
           python-version: '3.11'
 
       - name: 安装依赖
-        run: pip install numpy
+        run: pip install numpy requests cloudscraper
 
       - name: 运行预测
         run: |
@@ -62,6 +62,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html prediction_v12.json history.csv predict_v12.py
+          git add index.html prediction_v12.json history.csv predict_v12.py auto_predict.py
           git diff --staged --quiet || git commit -m "🤖 自动预测 $(date +%Y%m%d-%H%M)"
           git push origin main
